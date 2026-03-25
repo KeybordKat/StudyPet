@@ -2482,4 +2482,17 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('petCustomizeToggle').addEventListener('change', (e) => {
         toggleSetting('petCustomize', e.target.checked);
     });
+
+    // Reset data button
+    document.getElementById('resetDataButton').addEventListener('click', () => {
+        const confirmed = confirm('⚠️ Are you sure you want to reset ALL data?\n\nThis will delete:\n• All study sessions and statistics\n• All coins\n• All purchased items and themes\n• All subjects\n\nThis action cannot be undone!');
+
+        if (confirmed) {
+            // Clear all localStorage
+            localStorage.clear();
+
+            // Reload the page to reset everything
+            location.reload();
+        }
+    });
 });
