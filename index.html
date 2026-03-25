@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Pet</title>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-thin-rounded/css/uicons-thin-rounded.css'>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        // Apply saved pet position immediately to prevent glitch
+        (function() {
+            const savedPosition = localStorage.getItem('petPosition');
+            document.addEventListener('DOMContentLoaded', function() {
+                const characterContainer = document.querySelector('.character-container');
+                if (characterContainer) {
+                    if (savedPosition) {
+                        const pos = JSON.parse(savedPosition);
+                        characterContainer.style.left = pos.x + 'px';
+                        characterContainer.style.top = pos.y + 'px';
+                        characterContainer.style.transform = 'none';
+                    }
+                    // Show pet after position is applied
+                    characterContainer.classList.add('loaded');
+                }
+            }, false);
+        })();
+    </script>
+</head>
+<body>
+    <div class="main-screen">
+        <!-- Background -->
+        <div class="background"></div>
+
+        <!-- Coin tracker (top left) -->
+        <div class="coin-tracker">
+            <span class="coin-icon"><i class="fi fi-sr-circle-star"></i></span>
+            <span class="coin-count" id="coinCount">0</span>
+        </div>
+
+        <!-- Expandable menu (top right) -->
+        <div class="menu-container">
+            <button class="menu-button" id="menuButton">☰</button>
+            <div class="menu-items" id="menuItems">
+                <button class="menu-item" id="timerButton" title="Timer"><i class="fi fi-rr-clock"></i></button>
+                <button class="menu-item" id="statsButton" title="Statistics"><i class="fi fi-rr-chart-histogram"></i></button>
+                <button class="menu-item" id="shopButton" title="Shop"><i class="fi fi-rr-shopping-cart"></i></button>
+                <button class="menu-item" id="settingsButton" title="Settings"><i class="fi fi-rr-settings"></i></button>
+            </div>
+        </div>
+
+        <!-- Main character -->
+        <div class="character-container">
+            <img src="1-removebg-preview.png" alt="Study Pet" class="character" id="petCharacter">
+        </div>
+
+        <!-- Timer Setup Overlay -->
+        <div class="overlay" id="timerOverlay">
+            <div class="timer-setup-panel">
+                <button class="close-button" id="closeTimerSetupButton">✕</button>
+                <h2 class="panel-title">Set Timer <i class="fi fi-rr-clock"></i></h2>
+
+                <div class="timer-input-group">
+                    <label for="studyTimeInput">Study Time</label>
+                    <input type="text" id="studyTimeInput" class="timer-input" value="25 mins" readonly>
+                </div>
+
+                <div class="timer-input-group">
+                    <label for="breakTimeInput">Short Break Time</label>
+                    <input type="text" id="breakTimeInput" class="timer-input" value="5 mins" readonly>
+                </div>
+
+                <div class="timer-input-group">
+                    <label for="longBreakTimeInput">Long Break Time</label>
+                    <input type="text" id="longBreakTimeInput" class="timer-input" value="15 mins" readonly>
+                </div>
+
+                <div class="timer-input-group">
+                    <label>Subject</label>
+                    <div class="subject-selector" id="subjectSelector">
+                        <div class="subject-display" id="subjectDisplay">
+                            <span class="subject-text">Select a subject...</span>
+                        </div>
+                        <div class="subject-dropdown" id="subjectDropdown">
+                            <div class="subject-option add-subject" id="addSubjectOption">
+                                <span class="plus-icon">➕</span>
+                                <span>Add new subject</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="kawaii-button start-button" id="startTimerButton">Start 🎯</button>
+            </div>
+        </div>
+
+        <!-- Number Keypad Overlay -->
+        <div class="overlay" id="keypadOverlay">
+            <div class="keypad-panel">
+                <h3 class="panel-title">Enter Minutes <i class="fi fi-rr-clock"></i></h3>
+                <div class="keypad-display" id="keypadDisplay">0</div>
+                <div class="keypad-grid">
+                    <button class="keypad-button" data-value="1">1</button>
+                    <button class="keypad-button" data-value="2">2</button>
+                    <button class="keypad-button" data-value="3">3</button>
+                    <button class="keypad-button" data-value="4">4</button>
+                    <button class="keypad-button" data-value="5">5</button>
+                    <button class="keypad-button" data-value="6">6</button>
+                    <button class="keypad-button" data-value="7">7</button>
+                    <button class="keypad-button" data-value="8">8</button>
+                    <button class="keypad-button" data-value="9">9</button>
+                    <button class="keypad-button clear" data-value="clear">⌫</button>
+                    <button class="keypad-button" data-value="0">0</button>
+                    <button class="keypad-button confirm" data-value="confirm">✓</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Subject Overlay -->
+        <div class="overlay" id="addSubjectOverlay">
+            <div class="add-subject-panel">
+                <h3 class="panel-title">Add Subject 📚</h3>
+                <input type="text" id="subjectNameInput" class="subject-name-input" placeholder="Subject name...">
+
+                <div class="color-picker-section">
+                    <label>Pick a colour:</label>
+                    <div class="color-wheel" id="colorWheel">
+                        <div class="color-option" data-color="#ff6b9d" style="background: #ff6b9d;"></div>
+                        <div class="color-option" data-color="#ff8a5b" style="background: #ff8a5b;"></div>
+                        <div class="color-option" data-color="#ffd93d" style="background: #ffd93d;"></div>
+                        <div class="color-option" data-color="#6bcf7f" style="background: #6bcf7f;"></div>
+                        <div class="color-option" data-color="#4d9de0" style="background: #4d9de0;"></div>
+                        <div class="color-option" data-color="#b8a4ff" style="background: #b8a4ff;"></div>
+                        <div class="color-option" data-color="#ff6bcf" style="background: #ff6bcf;"></div>
+                        <div class="color-option" data-color="#95e1d3" style="background: #95e1d3;"></div>
+                    </div>
+                </div>
+
+                <div class="subject-preview">
+                    <div class="subject-color-tag" id="previewColorTag" style="background: #ff6b9d;"></div>
+                    <span id="previewSubjectName">Preview</span>
+                </div>
+
+                <div class="button-row">
+                    <button class="kawaii-button secondary" id="cancelSubjectButton">Cancel</button>
+                    <button class="kawaii-button" id="confirmSubjectButton">Add ✨</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Countdown Timer - Floating Above Pet -->
+        <div class="countdown-overlay" id="countdownOverlay">
+            <div class="timer-state-label" id="timerStateLabel">Study Time</div>
+            <div class="countdown-display" id="countdownDisplay">25:00</div>
+            <div class="pomodoro-tracker">
+                <div class="pomodoro-heart" id="heart1">♥</div>
+                <div class="pomodoro-heart" id="heart2">♥</div>
+                <div class="pomodoro-heart" id="heart3">♥</div>
+                <div class="pomodoro-heart" id="heart4">♥</div>
+                <div class="pomodoro-coffee">☕</div>
+            </div>
+            <div class="countdown-controls">
+                <button class="control-button pause-button" id="pauseButton">⏸️</button>
+                <button class="control-button stop-button" id="stopButton">⏹️</button>
+            </div>
+        </div>
+
+        <!-- Session Statistics Overlay -->
+        <div class="overlay" id="sessionStatsOverlay">
+            <div class="stats-panel">
+                <button class="close-button" id="closeStatsButton">✕</button>
+                <h2 class="panel-title">Session Complete! 🎉</h2>
+
+                <div class="stats-content">
+                    <div class="stat-item">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-details">
+                            <div class="stat-label">Subject</div>
+                            <div class="stat-value" id="sessionSubject">-</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-details">
+                            <div class="stat-label">Study Time</div>
+                            <div class="stat-value" id="sessionStudyTime">0 min</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-item">
+                        <div class="stat-icon">☕</div>
+                        <div class="stat-details">
+                            <div class="stat-label">Break Time</div>
+                            <div class="stat-value" id="sessionBreakTime">0 min</div>
+                        </div>
+                    </div>
+
+                    <div class="coins-earned">
+                        <div class="coins-earned-label">Coins Earned!</div>
+                        <div class="coins-earned-amount">
+                            <span class="coin-icon-large"><i class="fi fi-sr-circle-star"></i></span>
+                            <span class="coins-earned-value" id="sessionCoinsEarned">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="kawaii-button" id="backToMainButton">Back to Main 🏠</button>
+            </div>
+        </div>
+
+        <!-- Study Statistics Page -->
+        <div class="overlay" id="statsPageOverlay">
+            <div class="stats-page-panel">
+                <button class="close-button" id="closeStatsPageButton">✕</button>
+                <h2 class="panel-title">Study Statistics <i class="fi fi-rr-chart-histogram"></i></h2>
+
+                <!-- Controls -->
+                <div class="stats-controls">
+                    <div class="view-tabs">
+                        <button class="view-tab" id="weekTab" data-view="week">Week</button>
+                        <button class="view-tab active" id="monthTab" data-view="month">Month</button>
+                        <button class="view-tab" id="yearTab" data-view="year">Year</button>
+                    </div>
+                    <div class="date-navigator">
+                        <button class="nav-arrow" id="prevDate">◀</button>
+                        <span class="date-display" id="dateDisplay">January 2024</span>
+                        <button class="nav-arrow" id="nextDate">▶</button>
+                    </div>
+                    <button class="view-toggle-button" id="addSessionButton">+ Add Session</button>
+                </div>
+
+                <!-- Chart -->
+                <div class="chart-container">
+                    <div class="chart-area" id="chartArea">
+                        <!-- Bars will be generated here -->
+                    </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="chart-legend" id="chartLegend">
+                    <!-- Legend items will be generated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop Overlay -->
+        <div class="overlay" id="shopOverlay">
+            <div class="shop-panel">
+                <button class="close-button" id="closeShopButton">✕</button>
+                <h2 class="panel-title">Pet Shop <i class="fi fi-rr-shopping-cart"></i></h2>
+
+                <div class="shop-balance">
+                    <span>Your Coins: </span>
+                    <span class="shop-coin-icon"><i class="fi fi-sr-circle-star"></i></span>
+                    <span class="shop-coin-count" id="shopCoinCount">0</span>
+                </div>
+
+                <div class="shop-tabs">
+                    <button class="shop-tab active" id="itemsTab" data-tab="items">Items</button>
+                    <button class="shop-tab" id="themesTab" data-tab="themes">Themes</button>
+                    <button class="shop-tab" id="backgroundsTab" data-tab="backgrounds">Backgrounds</button>
+                </div>
+
+                <div class="shop-content">
+                    <div class="shop-items-grid" id="shopItemsGrid">
+                        <!-- Shop items will be generated here -->
+                    </div>
+
+                    <div class="shop-themes-grid" id="shopThemesGrid" style="display: none;">
+                        <!-- Theme options will be generated here -->
+                    </div>
+
+                    <div class="shop-backgrounds-grid" id="shopBackgroundsGrid" style="display: none;">
+                        <!-- Background options will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Session Overlay -->
+        <div class="overlay" id="editSessionOverlay">
+            <div class="timer-setup-panel">
+                <button class="close-button" id="closeEditSessionButton">✕</button>
+                <h2 class="panel-title" id="editSessionTitle">Edit Study Session 📝</h2>
+
+                <div class="timer-input-group" id="editSessionDateGroup">
+                    <label for="editSessionDate">Date</label>
+                    <input type="date" id="editSessionDate" class="timer-input">
+                </div>
+
+                <div class="timer-input-group">
+                    <label for="editSessionTime">Time Started (HH:MM)</label>
+                    <input type="time" id="editSessionTime" class="timer-input">
+                </div>
+
+                <div class="timer-input-group">
+                    <label for="editSessionDuration">Duration (minutes)</label>
+                    <input type="number" id="editSessionDuration" class="timer-input" min="1" max="480">
+                </div>
+
+                <div class="timer-input-group">
+                    <label>Subject</label>
+                    <div class="subject-selector" id="editSubjectSelector">
+                        <div class="subject-display" id="editSubjectDisplay">
+                            <span class="subject-text">Select a subject...</span>
+                        </div>
+                        <div class="subject-dropdown" id="editSubjectDropdown">
+                            <!-- Subject options will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button class="kawaii-button secondary" id="deleteSessionButton">Delete 🗑️</button>
+                    <button class="kawaii-button" id="saveSessionButton">Save ✓</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject Statistics Overlay -->
+        <div class="overlay" id="subjectStatsOverlay">
+            <div class="stats-panel">
+                <button class="close-button" id="closeSubjectStatsButton">✕</button>
+                <h2 class="panel-title" id="subjectStatsTitle">Subject Statistics <i class="fi fi-rr-chart-histogram"></i></h2>
+
+                <div class="stats-content" id="subjectStatsContent">
+                    <!-- Statistics will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Overlay -->
+        <div class="overlay" id="settingsOverlay">
+            <div class="settings-panel">
+                <button class="close-button" id="closeSettingsButton">✕</button>
+                <h2 class="panel-title">Settings <i class="fi fi-rr-settings"></i></h2>
+
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">🔊 Volume</div>
+                            <div class="setting-description">Enable or disable sounds</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="volumeToggle" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">✋ Draggable Items</div>
+                            <div class="setting-description">Allow moving items you bought</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="draggableToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-label">🐱 Pet Customisation</div>
+                            <div class="setting-description">Move and resize your pet (pinch or ctrl+scroll to resize)</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="petCustomizeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
