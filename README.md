@@ -15,7 +15,7 @@ A gamified Pomodoro study timer web app with a virtual pet companion.
 
 ## 🚀 Live Demo
 
-**Coming soon!** Deploy in progress...
+**[Try StudyPet Live!](https://mystudypet.netlify.app/)** 🐱✨
 
 ## 🛠️ Technologies Used
 
