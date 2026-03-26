@@ -256,6 +256,9 @@ function startTimer() {
     // Start countdown
     isPaused = false;
     startCountdown();
+
+    // Start study animation
+    startStudyAnimation();
 }
 
 function startCountdown() {
@@ -271,6 +274,9 @@ function startCountdown() {
                     // Study session completed
                     totalStudyTime += studyDuration;
                     pomodoroCount++;
+
+                    // Stop study animation
+                    stopStudyAnimation();
 
                     // Check if it's time for long break
                     if (pomodoroCount >= 4) {
@@ -290,6 +296,9 @@ function startCountdown() {
                     timerState = 'study';
                     timeRemaining = studyDuration * 60;
                     updatePomodoroDisplay();
+
+                    // Start study animation again
+                    startStudyAnimation();
                 } else if (timerState === 'longBreak') {
                     // Long break finished - reset pomodoro cycle
                     totalBreakTime += longBreakDuration;
@@ -297,6 +306,9 @@ function startCountdown() {
                     timerState = 'study';
                     timeRemaining = studyDuration * 60;
                     updatePomodoroDisplay();
+
+                    // Start study animation again
+                    startStudyAnimation();
                 }
 
                 updateTimerStatus();
@@ -357,6 +369,15 @@ function pauseTimer() {
     isPaused = !isPaused;
     const pauseButton = document.getElementById('pauseButton');
     pauseButton.textContent = isPaused ? '▶️' : '⏸️';
+
+    // Pause/resume study animation
+    if (timerState === 'study') {
+        if (isPaused) {
+            stopStudyAnimation();
+        } else {
+            startStudyAnimation();
+        }
+    }
 }
 
 function stopTimer() {
@@ -364,6 +385,9 @@ function stopTimer() {
         clearInterval(timerInterval);
         timerInterval = null;
     }
+
+    // Stop study animation
+    stopStudyAnimation();
 
     // Add partial time if timer was stopped mid-session
     let elapsedInCurrentPhase = 0;
@@ -2313,6 +2337,76 @@ function startPetBlinking() {
     }
 
     // Start the blinking cycle
+    scheduleNextBlink();
+}
+
+// Study animation variables
+let studyAnimationInterval = null;
+let isStudyAnimationActive = false;
+let blinkingTimeout = null;
+
+function startStudyAnimation() {
+    const petImg = document.getElementById('petCharacter');
+    if (!petImg) return;
+
+    // Stop blinking when studying
+    isStudyAnimationActive = true;
+    if (blinkingTimeout) {
+        clearTimeout(blinkingTimeout);
+        blinkingTimeout = null;
+    }
+
+    // Alternate between study sprites every 800ms
+    let currentFrame = 1;
+
+    // Set initial study sprite
+    petImg.src = 'StudySprite1.png';
+
+    // Clear any existing animation
+    if (studyAnimationInterval) {
+        clearInterval(studyAnimationInterval);
+    }
+
+    // Start the study animation
+    studyAnimationInterval = setInterval(() => {
+        currentFrame = currentFrame === 1 ? 2 : 1;
+        petImg.src = `StudySprite${currentFrame}.png`;
+    }, 800);
+}
+
+function stopStudyAnimation() {
+    const petImg = document.getElementById('petCharacter');
+    if (!petImg) return;
+
+    isStudyAnimationActive = false;
+
+    // Stop the study animation
+    if (studyAnimationInterval) {
+        clearInterval(studyAnimationInterval);
+        studyAnimationInterval = null;
+    }
+
+    // Return to normal idle sprite
+    petImg.src = '1-removebg-preview.png';
+
+    // Resume blinking (restart the cycle)
+    function scheduleNextBlink() {
+        if (isStudyAnimationActive) return; // Don't blink if studying again
+
+        const nextBlinkDelay = Math.random() * 10000 + 5000;
+        blinkingTimeout = setTimeout(() => {
+            if (!isStudyAnimationActive) { // Double-check before blinking
+                petImg.src = '2-removebg-preview.png';
+                setTimeout(() => {
+                    if (!isStudyAnimationActive) {
+                        petImg.src = '1-removebg-preview.png';
+                    }
+                }, 150);
+            }
+            scheduleNextBlink();
+        }, nextBlinkDelay);
+    }
+
     scheduleNextBlink();
 }
 
