@@ -2313,17 +2313,26 @@ function toggleSetting(settingName, value) {
 }
 
 // === Pet Blinking Animation ===
+// Study animation variables
+let studyAnimationInterval = null;
+let isStudyAnimationActive = false;
+
 function startPetBlinking() {
     const petImg = document.getElementById('petCharacter');
     if (!petImg) return;
 
     function blink() {
+        // Don't blink if studying
+        if (isStudyAnimationActive) return;
+
         // Close eyes
         petImg.src = '2-removebg-preview.png';
 
         // Open eyes after 150ms
         setTimeout(() => {
-            petImg.src = '1-removebg-preview.png';
+            if (!isStudyAnimationActive) {
+                petImg.src = '1-removebg-preview.png';
+            }
         }, 150);
     }
 
@@ -2331,7 +2340,9 @@ function startPetBlinking() {
         // Random interval between 5-15 seconds
         const nextBlinkDelay = Math.random() * 10000 + 5000;
         setTimeout(() => {
-            blink();
+            if (!isStudyAnimationActive) {
+                blink();
+            }
             scheduleNextBlink();
         }, nextBlinkDelay);
     }
@@ -2340,21 +2351,12 @@ function startPetBlinking() {
     scheduleNextBlink();
 }
 
-// Study animation variables
-let studyAnimationInterval = null;
-let isStudyAnimationActive = false;
-let blinkingTimeout = null;
-
 function startStudyAnimation() {
     const petImg = document.getElementById('petCharacter');
     if (!petImg) return;
 
     // Stop blinking when studying
     isStudyAnimationActive = true;
-    if (blinkingTimeout) {
-        clearTimeout(blinkingTimeout);
-        blinkingTimeout = null;
-    }
 
     // Alternate between study sprites every 800ms
     let currentFrame = 1;
@@ -2378,9 +2380,9 @@ function stopStudyAnimation() {
     const petImg = document.getElementById('petCharacter');
     if (!petImg) return;
 
+    // Stop the study animation
     isStudyAnimationActive = false;
 
-    // Stop the study animation
     if (studyAnimationInterval) {
         clearInterval(studyAnimationInterval);
         studyAnimationInterval = null;
@@ -2389,25 +2391,7 @@ function stopStudyAnimation() {
     // Return to normal idle sprite
     petImg.src = '1-removebg-preview.png';
 
-    // Resume blinking (restart the cycle)
-    function scheduleNextBlink() {
-        if (isStudyAnimationActive) return; // Don't blink if studying again
-
-        const nextBlinkDelay = Math.random() * 10000 + 5000;
-        blinkingTimeout = setTimeout(() => {
-            if (!isStudyAnimationActive) { // Double-check before blinking
-                petImg.src = '2-removebg-preview.png';
-                setTimeout(() => {
-                    if (!isStudyAnimationActive) {
-                        petImg.src = '1-removebg-preview.png';
-                    }
-                }, 150);
-            }
-            scheduleNextBlink();
-        }, nextBlinkDelay);
-    }
-
-    scheduleNextBlink();
+    // Blinking will automatically resume via the original startPetBlinking cycle
 }
 
 // Initialise on load
