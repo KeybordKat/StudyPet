@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playpen+Sans:wght@100..800&display=swap');
+
 :root {
     /* Default theme: Pastel Pink */
     --color-primary: #ffeef8;
@@ -26,7 +28,7 @@
 }
 
 body {
-    font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', cursive;
+    font-family: 'Playpen Sans', cursive;
     overflow: hidden;
     width: 100vw;
     height: 100vh;
@@ -231,6 +233,8 @@ body {
     height: auto;
     display: block;
     transition: opacity 0.1s ease-in-out;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 /* Equipped items */
@@ -687,6 +691,13 @@ body {
     align-items: center;
     z-index: 100;
     gap: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 3px solid var(--color-button-border);
+    border-radius: 30px;
+    padding: 40px 60px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    width: 700px;
 }
 
 .countdown-overlay.active {
@@ -694,15 +705,16 @@ body {
 }
 
 .countdown-display {
-    font-size: 48px;
+    font-size: 10vw;
     font-weight: bold;
-    color: var(--color-text);
-    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8),
-                 0 0 10px rgba(255, 107, 181, 0.3);
+    color: white !important;
     text-align: center;
     background: none;
     padding: 0;
     border: none;
+    min-width: 400px;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .countdown-controls {
@@ -713,30 +725,39 @@ body {
 .control-button {
     width: 50px;
     height: 50px;
-    background: var(--color-panel-bg);
-    border: 3px solid var(--color-button-border);
+    background: white;
+    border: none;
     border-radius: 50%;
     font-size: 24px;
     cursor: pointer;
-    box-shadow: 0 4px 0 var(--color-button-border);
+    box-shadow: 0 0 12px 4px rgba(0, 0, 0, 0.3);
     transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--color-text);
 }
 
 .control-button:hover {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 var(--color-button-border);
+    box-shadow: 0 0 16px 6px rgba(0, 0, 0, 0.4);
+}
+
+.control-button i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .timer-state-label {
-    font-size: 18px;
+    font-size: 28px;
     font-weight: bold;
-    color: var(--color-text-secondary);
+    color: white !important;
     text-transform: uppercase;
     letter-spacing: 2px;
     margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-decoration: underline;
 }
 
 .pomodoro-tracker {
@@ -752,6 +773,14 @@ body {
     color: var(--color-button-border);
     opacity: 0.3;
     transition: opacity 0.3s;
+    background: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.2);
 }
 
 .pomodoro-heart.filled {
@@ -776,6 +805,15 @@ body {
     font-size: 24px;
     margin-left: 8px;
     opacity: 0.5;
+    background: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.2);
+    color: var(--color-text);
 }
 
 .control-button:active {
@@ -784,16 +822,15 @@ body {
 }
 
 .control-button.stop-button {
-    border-color: var(--color-toggle-bg);
-    box-shadow: 0 4px 0 var(--color-toggle-bg);
+    box-shadow: 0 0 12px 4px rgba(0, 0, 0, 0.3);
 }
 
 .control-button.stop-button:hover {
-    box-shadow: 0 2px 0 var(--color-toggle-bg);
+    box-shadow: 0 0 16px 6px rgba(0, 0, 0, 0.4);
 }
 
 .control-button.stop-button:active {
-    box-shadow: 0 0 0 var(--color-toggle-bg);
+    box-shadow: 0 0 10px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* Session Statistics Panel */
@@ -857,6 +894,16 @@ body {
     font-size: 40px;
     width: 50px;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
 .stat-details {

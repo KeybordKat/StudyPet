@@ -2358,7 +2358,7 @@ function startStudyAnimation() {
     // Stop blinking when studying
     isStudyAnimationActive = true;
 
-    // Alternate between study sprites every 800ms
+    // Alternate between study sprites every 1000ms (1 second to match timer)
     let currentFrame = 1;
 
     // Set initial study sprite
@@ -2373,7 +2373,7 @@ function startStudyAnimation() {
     studyAnimationInterval = setInterval(() => {
         currentFrame = currentFrame === 1 ? 2 : 1;
         petImg.src = `StudySprite${currentFrame}.png`;
-    }, 800);
+    }, 1000);
 }
 
 function stopStudyAnimation() {
@@ -2396,6 +2396,12 @@ function stopStudyAnimation() {
 
 // Initialise on load
 window.addEventListener('DOMContentLoaded', () => {
+    // Preload study sprites for flawless swapping
+    const studySprite1 = new Image();
+    const studySprite2 = new Image();
+    studySprite1.src = 'StudySprite1.png';
+    studySprite2.src = 'StudySprite2.png';
+
     // Apply saved pet position immediately to prevent glitch
     const savedPosition = localStorage.getItem('petPosition');
     if (savedPosition) {
