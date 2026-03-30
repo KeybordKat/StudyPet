@@ -445,7 +445,7 @@ function closeSessionStats() {
     // Save session data to history
     if (totalStudyTime > 0) {
         saveStudySession({
-            date: new Date().toISOString(),
+            date: new Date(sessionStartTime).toISOString(),
             subject: selectedSubject,
             studyTime: totalStudyTime,
             breakTime: totalBreakTime
@@ -652,7 +652,7 @@ function renderMonthChart(container) {
                 if (!weekData[index][subjectName]) {
                     weekData[index][subjectName] = 0;
                 }
-                weekData[index][subjectName] += session.studyTime;
+                weekData[index][subjectName] += session.studyTime + (session.breakTime || 0);
             }
         });
     });
@@ -744,7 +744,7 @@ function renderYearChart(container) {
             if (!monthData[month][subjectName]) {
                 monthData[month][subjectName] = 0;
             }
-            monthData[month][subjectName] += session.studyTime;
+            monthData[month][subjectName] += session.studyTime + (session.breakTime || 0);
         }
     });
 
@@ -822,7 +822,7 @@ function renderWeekChart(container) {
             // Store the session with its time and index
             weekData[adjustedDay].push({
                 time: sessionDate.getHours() + sessionDate.getMinutes() / 60,
-                duration: session.studyTime,
+                duration: session.studyTime + (session.breakTime || 0),
                 subject: session.subject,
                 sessionIndex: index
             });
@@ -1001,7 +1001,7 @@ function calculateWeekStats(subjectName) {
         if (session.subject && session.subject.name === subjectName) {
             const sessionDate = new Date(session.date);
             if (sessionDate >= weekStart && sessionDate < weekEnd) {
-                total += session.studyTime;
+                total += session.studyTime + (session.breakTime || 0);
                 sessionCount++;
             }
         }
@@ -1013,7 +1013,7 @@ function calculateWeekStats(subjectName) {
         if (session.subject && session.subject.name === subjectName) {
             const sessionDate = new Date(session.date);
             if (sessionDate >= prevWeekStart && sessionDate < prevWeekEnd) {
-                prevTotal += session.studyTime;
+                prevTotal += session.studyTime + (session.breakTime || 0);
             }
         }
     });
@@ -1046,7 +1046,7 @@ function calculateMonthStats(subjectName) {
         if (session.subject && session.subject.name === subjectName) {
             const sessionDate = new Date(session.date);
             if (sessionDate >= monthStart && sessionDate <= monthEnd) {
-                total += session.studyTime;
+                total += session.studyTime + (session.breakTime || 0);
                 sessionCount++;
             }
         }
@@ -1058,7 +1058,7 @@ function calculateMonthStats(subjectName) {
         if (session.subject && session.subject.name === subjectName) {
             const sessionDate = new Date(session.date);
             if (sessionDate >= prevMonthStart && sessionDate <= prevMonthEnd) {
-                prevTotal += session.studyTime;
+                prevTotal += session.studyTime + (session.breakTime || 0);
             }
         }
     });
@@ -1089,7 +1089,7 @@ function calculateYearStats(subjectName) {
         if (session.subject && session.subject.name === subjectName) {
             const sessionDate = new Date(session.date);
             if (sessionDate >= yearStart && sessionDate <= yearEnd) {
-                total += session.studyTime;
+                total += session.studyTime + (session.breakTime || 0);
                 sessionCount++;
             }
         }
@@ -1101,7 +1101,7 @@ function calculateYearStats(subjectName) {
         if (session.subject && session.subject.name === subjectName) {
             const sessionDate = new Date(session.date);
             if (sessionDate >= prevYearStart && sessionDate <= prevYearEnd) {
-                prevTotal += session.studyTime;
+                prevTotal += session.studyTime + (session.breakTime || 0);
             }
         }
     });
