@@ -368,16 +368,7 @@ function updatePomodoroDisplay() {
 function pauseTimer() {
     isPaused = !isPaused;
     const pauseButton = document.getElementById('pauseButton');
-    pauseButton.textContent = isPaused ? '▶️' : '⏸️';
-
-    // Pause/resume study animation
-    if (timerState === 'study') {
-        if (isPaused) {
-            stopStudyAnimation();
-        } else {
-            startStudyAnimation();
-        }
-    }
+    pauseButton.innerHTML = isPaused ? '<i class="fi fi-rr-play"></i>' : '<i class="fi fi-rr-pause"></i>';
 }
 
 function stopTimer() {
@@ -416,7 +407,7 @@ function stopTimer() {
 
     // Reset state
     isPaused = false;
-    document.getElementById('pauseButton').textContent = '⏸️';
+    document.getElementById('pauseButton').innerHTML = '<i class="fi fi-rr-pause"></i>';
 
     // Calculate coins earned (1 coin per 10 minutes)
     const coinsEarned = Math.floor(totalStudyTime / 10);
@@ -2063,6 +2054,8 @@ function applySettings() {
         characterContainer.style.left = pos.x + 'px';
         characterContainer.style.top = pos.y + 'px';
         characterContainer.style.transform = 'none';
+        // Ensure pet stays within bounds
+        constrainPetToBounds();
     }
 
     if (settings.petCustomize) {
@@ -2170,6 +2163,42 @@ function disablePetDragging(container, character) {
 
     // Keep the position saved so pet stays where it was placed
     // Don't remove from localStorage
+}
+
+let lastViewportWidth = window.innerWidth;
+let lastViewportHeight = window.innerHeight;
+
+function constrainPetToBounds() {
+    const characterContainer = document.querySelector('.character-container');
+    if (!characterContainer) return;
+
+    const parentRect = characterContainer.parentElement.getBoundingClientRect();
+
+    // Get current position
+    let left = parseInt(characterContainer.style.left) || 0;
+    let top = parseInt(characterContainer.style.top) || 0;
+
+    // Calculate relative position as percentage
+    const leftPercent = (left / lastViewportWidth) * 100;
+    const topPercent = (top / lastViewportHeight) * 100;
+
+    // Calculate new position based on new viewport size
+    const newLeft = (leftPercent / 100) * parentRect.width;
+    const newTop = (topPercent / 100) * parentRect.height;
+
+    // Update position
+    characterContainer.style.left = newLeft + 'px';
+    characterContainer.style.top = newTop + 'px';
+
+    // Update last viewport size
+    lastViewportWidth = parentRect.width;
+    lastViewportHeight = parentRect.height;
+
+    // Save the new position
+    localStorage.setItem('petPosition', JSON.stringify({
+        x: newLeft,
+        y: newTop
+    }));
 }
 
 let petResizeHandlers = null;
@@ -2402,6 +2431,14 @@ window.addEventListener('DOMContentLoaded', () => {
     studySprite1.src = 'StudySprite1.png';
     studySprite2.src = 'StudySprite2.png';
 
+    // Initialize viewport dimensions
+    const mainScreen = document.querySelector('.main-screen');
+    if (mainScreen) {
+        const rect = mainScreen.getBoundingClientRect();
+        lastViewportWidth = rect.width;
+        lastViewportHeight = rect.height;
+    }
+
     // Apply saved pet position immediately to prevent glitch
     const savedPosition = localStorage.getItem('petPosition');
     if (savedPosition) {
@@ -2419,6 +2456,9 @@ window.addEventListener('DOMContentLoaded', () => {
         const character = document.querySelector('.character');
         character.style.transform = `scale(${petScale})`;
     }
+
+    // Add window resize listener to keep pet on screen
+    window.addEventListener('resize', constrainPetToBounds);
 
     loadCoins();
     loadSubjects();
